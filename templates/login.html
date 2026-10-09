@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ t('sign_in') }} - {{ shop_name }}{% endblock %}
+
+{% block public %}
+<div class="login-wrap">
+  <div class="login-brand">
+    <div class="logo"><svg class="icon"><use href="#i-scissors"/></svg></div>
+    <h1>{{ shop_name }}</h1>
+    <p>{{ t('login_tagline') }}</p>
+  </div>
+
+  <div class="login-form">
+    <a class="btn btn-light lang-corner" href="{{ url_for('change_language', code='ur' if lang == 'en' else 'en') }}">
+      <svg class="icon"><use href="#i-languages"/></svg>{{ t('language') }}
+    </a>
+
+    <div class="login-box">
+      <h2>{{ t('welcome_back') }}</h2>
+      <p class="sub">{{ t('sign_in_to_continue') }}</p>
+      <form method="post">
+        <div class="field">
+          <label for="username">{{ t('username') }}</label>
+          <div class="input-icon">
+            <svg class="icon"><use href="#i-user"/></svg>
+            <input id="username" name="username" required autofocus>
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">{{ t('password') }}</label>
+          <div class="input-icon">
+            <svg class="icon"><use href="#i-lock"/></svg>
+            <input id="password" name="password" type="password" required>
+          </div>
+        </div>
+        <button class="btn btn-block" type="submit">{{ t('sign_in') }}</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

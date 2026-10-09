@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('customers') }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <form class="search" method="get">
+    <div class="input-icon">
+      <svg class="icon"><use href="#i-search"/></svg>
+      <input name="q" value="{{ q }}" placeholder="{{ t('search_customers') }}">
+    </div>
+  </form>
+  <a class="btn" href="{{ url_for('add_customer') }}">
+    <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_customer') }}
+  </a>
+</div>
+
+<div class="card p0">
+  {% if customers %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{ t('customer_name') }}</th>
+          <th>{{ t('phone') }}</th>
+          <th>{{ t('address') }}</th>
+          <th>{{ t('added_on') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in customers %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td><strong>{{ c.name }}</strong></td>
+          <td>{% if c.phone %}<span dir="ltr">{{ c.phone }}</span>{% else %}—{% endif %}</td>
+          <td>{{ c.address or '—' }}</td>
+          <td><span dir="ltr">{{ c.created_at }}</span></td>
+                    <td class="actions">
+            <a class="icon-btn" title="{{ t('measurements') }}" href="{{ url_for('add_measurement', customer_id=c.id) }}">
+              <svg class="icon"><use href="#i-ruler"/></svg>
+            </a>
+            <a class="icon-btn" title="{{ t('edit') }}" href="{{ url_for('edit_customer', customer_id=c.id) }}">
+              <svg class="icon"><use href="#i-pencil"/></svg>
+            </a>
+            <button type="button" class="icon-btn danger js-delete" title="{{ t('delete') }}"
+                    data-name="{{ c.name }}"
+                    data-action="{{ url_for('delete_customer', customer_id=c.id) }}">
+              <svg class="icon"><use href="#i-trash"/></svg>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% elif q %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-search"/></svg>
+    <h3>{{ t('no_results_title') }}</h3>
+    <p>{{ t('no_results_text') }}</p>
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-users"/></svg>
+    <h3>{{ t('no_customers_title') }}</h3>
+    <p>{{ t('no_customers_text') }}</p>
+    <p style="margin-top:16px">
+      <a class="btn" href="{{ url_for('add_customer') }}">
+        <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_customer') }}
+      </a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

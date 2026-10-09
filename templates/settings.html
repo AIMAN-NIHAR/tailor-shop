@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('settings') }}{% endblock %}
+
+{% block content %}
+<div class="grid-2" style="align-items:start;gap:20px;max-width:900px">
+
+  <div class="card">
+    <div class="card-title">{{ t('shop_settings') }}</div>
+    <form method="post" action="{{ url_for('settings_page') }}">
+      <input type="hidden" name="form" value="shop_name">
+      <div class="field">
+        <label for="shop_name">{{ t('shop_name_label') }}</label>
+        <input id="shop_name" name="shop_name" value="{{ shop_name }}" required>
+      </div>
+      <button class="btn" type="submit">{{ t('save') }}</button>
+    </form>
+  </div>
+
+    <div class="card">
+    <div class="card-title">{{ t('change_username') }}</div>
+    <form method="post" action="{{ url_for('change_username') }}">
+      <div class="field">
+        <label for="new_username">{{ t('new_username') }}</label>
+        <input id="new_username" name="new_username" value="{{ session.user }}" required>
+      </div>
+      <div class="field">
+        <label for="current_password_for_username">{{ t('username_password_confirm') }}</label>
+        <input id="current_password_for_username" name="current_password_for_username" type="password" required>
+      </div>
+      <button class="btn" type="submit">{{ t('save') }}</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">{{ t('change_password') }}</div>
+    <form method="post" action="{{ url_for('change_password') }}">
+      <div class="field">
+        <label for="current_password">{{ t('current_password') }}</label>
+        <input id="current_password" name="current_password" type="password" required>
+      </div>
+      <div class="field">
+        <label for="new_password">{{ t('new_password') }}</label>
+        <input id="new_password" name="new_password" type="password" required minlength="4">
+      </div>
+      <div class="field">
+        <label for="confirm_password">{{ t('confirm_password') }}</label>
+        <input id="confirm_password" name="confirm_password" type="password" required minlength="4">
+      </div>
+      <button class="btn" type="submit">{{ t('save') }}</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">{{ t('backup') }}</div>
+    <p class="muted" style="margin-bottom:16px">{{ t('backup_hint') }}</p>
+    <a class="btn btn-light" href="{{ url_for('backup') }}">
+      <svg class="icon"><use href="#i-download"/></svg>{{ t('download_backup') }}
+    </a>
+  </div>
+
+</div>
+{% endblock %}

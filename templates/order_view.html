@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('order_number') }}{{ order.id }}{% endblock %}
+
+{% block content %}
+<p style="margin-bottom:18px">
+  <a class="btn btn-light" href="{{ url_for('orders') }}">
+    <svg class="icon"><use href="#i-orders"/></svg>{{ t('back_to_orders') }}
+  </a>
+</p>
+
+<div class="stats" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr))">
+  <div class="card stat">
+    <div class="stat-icon"><svg class="icon"><use href="#i-orders"/></svg></div>
+    <div><div class="label">{{ t('total_amount') }}</div><div class="value">{{ '%.0f'|format(total) }}</div></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon amber"><svg class="icon"><use href="#i-wallet"/></svg></div>
+    <div><div class="label">{{ t('paid') }}</div><div class="value">{{ '%.0f'|format(paid) }}</div></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon {{ 'red' if remaining > 0 else '' }}"><svg class="icon"><use href="#i-alert"/></svg></div>
+    <div><div class="label">{{ t('remaining') }}</div><div class="value">{{ '%.0f'|format(remaining) }}</div></div>
+  </div>
+</div>
+
+<div class="grid-2" style="align-items:start;gap:20px">
+  <div class="card">
+    <div class="card-title">{{ t('view_order') }}</div>
+
+    <div class="field"><label>{{ t('customer') }}</label>
+      <p><strong>{{ order.customer_name }}</strong></p>
+      {% if order.customer_phone %}<p class="muted" dir="ltr">{{ order.customer_phone }}</p>{% endif %}
+      {% if order.customer_address %}<p class="muted">{{ order.customer_address }}</p>{% endif %}
+    </div>
+
+    <div class="grid-2">
+      <div class="field"><label>{{ t('garment_type') }}</label>
+        <p><span class="tag">{{ t('garment_' + order.garment_type) }}</span></p>
+      </div>
+      <div class="field"><label>{{ t('quantity') }}</label><p>{{ order.quantity }}</p></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field"><label>{{ t('order_date') }}</label><p dir="ltr">{{ order.order_date }}</p></div>
+      <div class="field"><label>{{ t('delivery_date') }}</label>
+        <p dir="ltr">{{ order.delivery_date or '—' }}</p>
+      </div>
+    </div>
+
+    <div class="field"><label>{{ t('status') }}</label>
+      <p><span class="badge b-{{ order.status|lower }}">{{ t('status_' + order.status|lower) }}</span></p>
+    </div>
+
+    {% if order.notes %}
+    <div class="field"><label>{{ t('notes') }}</label><p>{{ order.notes }}</p></div>
+    {% endif %}
+
+    <a class="btn btn-light" href="{{ url_for('edit_order', order_id=order.id) }}">
+      <svg class="icon"><use href="#i-pencil"/></svg>{{ t('edit') }}
+    </a>
+  </div>
+
+  <div class="card">
+    <div class="card-title">{{ t('payment_history') }}</div>
+
+    {% if remaining > 0 %}
+    <form method="post" action="{{ url_for('add_payment', order_id=order.id) }}" style="margin-bottom:18px">
+      <div class="grid-2">
+        <div class="field">
+          <label for="amount">{{ t('amount') }}</label>
+          <input id="amount" name="amount" type="number" min="0" step="1" dir="ltr" required
+                 max="{{ remaining }}" placeholder="{{ '%.0f'|format(remaining) }}">
+        </div>
+        <div class="field">
+          <label for="note">{{ t('note_optional') }}</label>
+          <input id="note" name="note">
+        </div>
+      </div>
+      <button class="btn" type="submit">
+        <svg class="icon"><use href="#i-wallet"/></svg>{{ t('add_payment') }}
+      </button>
+    </form>
+    {% else %}
+    <p class="tag" style="margin-bottom:18px">{{ t('fully_paid') }}</p>
+    {% endif %}
+
+    {% if payments %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>{{ t('amount') }}</th><th>{{ t('notes') }}</th><th>{{ t('order_date') }}</th></tr>
+        </thead>
+        <tbody>
+          {% for p in payments %}
+          <tr>
+            <td>{{ '%.0f'|format(p.amount) }}</td>
+            <td>{{ p.note or '—' }}</td>
+            <td dir="ltr">{{ p.paid_on }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="muted">{{ t('no_payments_yet') }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

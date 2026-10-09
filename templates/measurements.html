@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('measurements') }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <form class="search" method="get">
+    <div class="input-icon">
+      <svg class="icon"><use href="#i-search"/></svg>
+      <input name="q" value="{{ q }}" placeholder="{{ t('search_measurements') }}">
+    </div>
+  </form>
+  <a class="btn" href="{{ url_for('add_measurement') }}">
+    <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_measurement') }}
+  </a>
+</div>
+
+<div class="card p0">
+  {% if measurements %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ t('customer') }}</th>
+          <th>{{ t('garment_type') }}</th>
+          <th>{{ t('m_chest') }}</th>
+          <th>{{ t('m_waist') }}</th>
+          <th>{{ t('m_length') }}</th>
+          <th>{{ t('last_updated') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in measurements %}
+        <tr>
+          <td>
+            <strong>{{ m.customer_name }}</strong>
+            {% if m.customer_phone %}<br><span class="muted" dir="ltr">{{ m.customer_phone }}</span>{% endif %}
+          </td>
+          <td><span class="tag">{{ t('garment_' + m.garment_type) }}</span></td>
+          <td>{{ m.chest if m.chest is not none else '—' }}</td>
+          <td>{{ m.waist if m.waist is not none else '—' }}</td>
+          <td>{{ m.length if m.length is not none else '—' }}</td>
+          <td><span dir="ltr">{{ m.updated_at }}</span></td>
+          <td class="actions">
+            <a class="icon-btn" title="{{ t('edit') }}" href="{{ url_for('edit_measurement', measurement_id=m.id) }}">
+              <svg class="icon"><use href="#i-pencil"/></svg>
+            </a>
+            <button type="button" class="icon-btn danger js-delete" title="{{ t('delete') }}"
+                    data-name="{{ m.customer_name }} — {{ t('garment_' + m.garment_type) }}"
+                    data-title="{{ t('delete_measurement_title') }}"
+                    data-text="{{ t('delete_measurement_text') }}"
+                    data-action="{{ url_for('delete_measurement', measurement_id=m.id) }}">
+              <svg class="icon"><use href="#i-trash"/></svg>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% elif q %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-search"/></svg>
+    <h3>{{ t('no_results_title') }}</h3>
+    <p>{{ t('no_results_text') }}</p>
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-ruler"/></svg>
+    <h3>{{ t('no_measurements_title') }}</h3>
+    <p>{{ t('no_measurements_text') }}</p>
+    <p style="margin-top:16px">
+      <a class="btn" href="{{ url_for('add_measurement') }}">
+        <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_measurement') }}
+      </a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

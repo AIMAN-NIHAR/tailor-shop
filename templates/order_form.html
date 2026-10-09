@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('edit_order') if editing else t('add_order') }}{% endblock %}
+
+{% block content %}
+<div class="card form-card">
+  <form method="post">
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="customer_id">{{ t('customer') }} *</label>
+        <select id="customer_id" name="customer_id" required>
+          <option value="">{{ t('select_customer') }}</option>
+          {% for c in all_customers %}
+          <option value="{{ c.id }}" {{ 'selected' if order.customer_id|string == c.id|string }}>
+            {{ c.name }}{% if c.phone %} — {{ c.phone }}{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="garment_type">{{ t('garment_type') }} *</label>
+        <select id="garment_type" name="garment_type" required>
+          <option value="">{{ t('select_customer') }}</option>
+          {% for g in garment_types %}
+          <option value="{{ g }}" {{ 'selected' if order.garment_type == g }}>{{ t('garment_' + g) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="quantity">{{ t('quantity') }}</label>
+        <input id="quantity" name="quantity" type="number" min="1" step="1" dir="ltr"
+               value="{{ order.quantity or 1 }}">
+      </div>
+      <div class="field">
+        <label for="total_amount">{{ t('total_amount') }} *</label>
+        <input id="total_amount" name="total_amount" type="number" min="0" step="1" dir="ltr" required
+               value="{{ order.total_amount if order.total_amount is not none else '' }}">
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="field">
+        <label for="delivery_date">{{ t('delivery_date') }}</label>
+        <input id="delivery_date" name="delivery_date" type="date" dir="ltr"
+               value="{{ order.delivery_date or '' }}">
+      </div>
+      <div class="field">
+        <label for="status">{{ t('status') }}</label>
+        <select id="status" name="status">
+          {% for s in statuses %}
+          <option value="{{ s }}" {{ 'selected' if order.status == s }}>{{ t('status_' + s|lower) }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    {% if not editing %}
+    <div class="field">
+      <label for="advance">{{ t('advance_paid') }}</label>
+      <input id="advance" name="advance" type="number" min="0" step="1" dir="ltr" value="0">
+    </div>
+    {% endif %}
+
+    <div class="field">
+      <label for="notes">{{ t('notes') }}</label>
+      <textarea id="notes" name="notes">{{ order.notes or '' }}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ t('save') }}</button>
+      <a class="btn btn-light" href="{{ url_for('orders') }}">{{ t('cancel') }}</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

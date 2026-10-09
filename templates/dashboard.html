@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('dashboard') }}{% endblock %}
+
+{% block content %}
+<div class="stats">
+  <div class="card stat">
+    <div class="stat-icon"><svg class="icon"><use href="#i-users"/></svg></div>
+    <div><div class="label">{{ t('total_customers') }}</div><div class="value">{{ stats.customers }}</div></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon"><svg class="icon"><use href="#i-orders"/></svg></div>
+    <div><div class="label">{{ t('active_orders') }}</div><div class="value">{{ stats.active }}</div></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon amber"><svg class="icon"><use href="#i-calendar"/></svg></div>
+    <div><div class="label">{{ t('due_today') }}</div><div class="value">{{ stats.today }}</div></div>
+  </div>
+  <div class="card stat">
+    <div class="stat-icon red"><svg class="icon"><use href="#i-alert"/></svg></div>
+    <div><div class="label">{{ t('overdue') }}</div><div class="value">{{ stats.overdue }}</div></div>
+  </div>
+</div>
+
+<div class="card p0">
+  <div style="padding:20px 20px 0"><div class="card-title">{{ t('upcoming_deliveries') }}</div></div>
+
+  {% if upcoming %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ t('customer') }}</th>
+          <th>{{ t('garment_type') }}</th>
+          <th>{{ t('delivery_date') }}</th>
+          <th>{{ t('status') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in upcoming %}
+        {% set overdue = o.delivery_date < today %}
+        <tr>
+          <td><strong>{{ o.customer_name }}</strong></td>
+          <td><span class="tag">{{ t('garment_' + o.garment_type) }}</span></td>
+          <td><span dir="ltr" class="{{ 'overdue-date' if overdue else '' }}">{{ o.delivery_date }}</span></td>
+          <td><span class="badge b-{{ o.status|lower }}">{{ t('status_' + o.status|lower) }}</span></td>
+          <td class="actions">
+            <a class="icon-btn" title="{{ t('view') }}" href="{{ url_for('view_order', order_id=o.id) }}">
+              <svg class="icon"><use href="#i-eye"/></svg>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-calendar"/></svg>
+    <h3>{{ t('no_orders_title') }}</h3>
+    <p>{{ t('no_orders_text') }}</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

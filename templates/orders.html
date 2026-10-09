@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block heading %}{{ t('orders') }}{% endblock %}
+
+{% block content %}
+<div class="page-head">
+  <form class="search" method="get" style="display:flex;gap:10px;flex:1;max-width:600px">
+    <div class="input-icon" style="flex:1">
+      <svg class="icon"><use href="#i-search"/></svg>
+      <input name="q" value="{{ q }}" placeholder="{{ t('search_orders') }}">
+    </div>
+    <select name="status" onchange="this.form.submit()" style="max-width:180px">
+      <option value="">{{ t('all_statuses') }}</option>
+      {% for s in statuses %}
+      <option value="{{ s }}" {{ 'selected' if status == s }}>{{ t('status_' + s|lower) }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  <a class="btn" href="{{ url_for('add_order') }}">
+    <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_order') }}
+  </a>
+</div>
+
+<div class="card p0">
+  {% if orders %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ t('order_number') }}</th>
+          <th>{{ t('customer') }}</th>
+          <th>{{ t('garment_type') }}</th>
+          <th>{{ t('delivery_date') }}</th>
+          <th>{{ t('status') }}</th>
+          <th>{{ t('remaining') }}</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in orders %}
+        {% set remaining = o.total_amount - o.paid %}
+        {% set overdue = o.delivery_date and o.delivery_date < today and o.status not in ('Delivered', 'Cancelled') %}
+        <tr>
+          <td>#{{ o.id }}</td>
+          <td>
+            <strong>{{ o.customer_name }}</strong>
+            {% if o.customer_phone %}<br><span class="muted" dir="ltr">{{ o.customer_phone }}</span>{% endif %}
+          </td>
+          <td>
+            <span class="tag">{{ t('garment_' + o.garment_type) }}</span>{% if o.quantity > 1 %} × {{ o.quantity }}{% endif %}
+          </td>
+          <td>
+            {% if o.delivery_date %}
+              <span dir="ltr" class="{{ 'overdue-date' if overdue else '' }}">{{ o.delivery_date }}</span>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+          <td><span class="badge b-{{ o.status|lower }}">{{ t('status_' + o.status|lower) }}</span></td>
+          <td>
+            {% if remaining <= 0 %}
+              <span class="muted">{{ t('fully_paid') }}</span>
+            {% else %}
+              {{ '%.0f'|format(remaining) }}
+            {% endif %}
+          </td>
+          <td class="actions">
+            <a class="icon-btn" title="{{ t('view_order') }}" href="{{ url_for('view_order', order_id=o.id) }}">
+              <svg class="icon"><use href="#i-eye"/></svg>
+            </a>
+            <a class="icon-btn" title="{{ t('edit') }}" href="{{ url_for('edit_order', order_id=o.id) }}">
+              <svg class="icon"><use href="#i-pencil"/></svg>
+            </a>
+            <button type="button" class="icon-btn danger js-delete" title="{{ t('delete') }}"
+                    data-name="#{{ o.id }} - {{ o.customer_name }}"
+                    data-title="{{ t('delete_order_title') }}"
+                    data-text="{{ t('delete_order_text') }}"
+                    data-action="{{ url_for('delete_order', order_id=o.id) }}">
+              <svg class="icon"><use href="#i-trash"/></svg>
+            </button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% elif q or status %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-search"/></svg>
+    <h3>{{ t('no_results_title') }}</h3>
+    <p>{{ t('no_results_text') }}</p>
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <svg class="icon"><use href="#i-orders"/></svg>
+    <h3>{{ t('no_orders_title2') }}</h3>
+    <p>{{ t('no_orders_text2') }}</p>
+    <p style="margin-top:16px">
+      <a class="btn" href="{{ url_for('add_order') }}">
+        <svg class="icon"><use href="#i-plus"/></svg>{{ t('add_order') }}
+      </a>
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
